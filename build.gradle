@@ -319,7 +319,7 @@ dependencies {
     //implementation "org.esup-portail:esup-otp-cas:v1.2.5-cas_v7.2.x"
     //implementation "org.esup-portail:esup-otp-cas:v1.2.7-cas_v7.2.x"
     //implementation "org.esup-portail:esup-otp-cas:v2.1.0-cas_v7.3.x"
-    implementation "com.github.EsupPortail:esup-otp-cas:v1.2.7-cas_v7.2.x"
+    implementation "com.github.EsupPortail:esup-otp-cas:v2.1.0-cas_v7.3.x"
 
 
     // --- Patch remember-me (overlay) ---
