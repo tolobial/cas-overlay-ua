@@ -1,0 +1,93 @@
+/* ==========================================================
+ * UA CAS - custom.css
+ * ========================================================== */
+
+/* ---- Logo ---- */
+#cas-logo, .cas-logo {
+  height: 72px;
+  width: auto;
+}
+
+/* ---- Option police manuscrite élégante ---- */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
+
+/* ==========================================================
+   Grille et boutons des actions du login
+   ========================================================== */
+
+#pmlinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .5rem 1.25rem; /* corrigé (manquait un point-virgule + unité) */
+  margin-top: .5rem;
+}
+
+/* Empile en 1 colonne sur petit écran */
+@media (max-width: 640px) {
+  #pmlinks { grid-template-columns: 1fr; }
+}
+
+/* Chaque bouton prend 100% de sa colonne */
+#pmlinks .pm-btn {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  background-color: #0056b3;
+  color: #fff;
+  border: none;
+  padding: .75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .2s ease-in-out;
+}
+
+/* Hover & Focus */
+#pmlinks .pm-btn:hover,
+#pmlinks .pm-btn:focus {
+  background-color: #003f8a;
+}
+
+/* Icônes */
+#pmlinks .mdi {
+  font-size: 1.25rem;
+}
+
+/* Alignement d’un item à droite */
+#pmlinks .align-end {
+  justify-content: flex-end;
+}
+
+/* ==========================================================
+   Bouton rond (optionnel, ex : lien d’info, aide rapide)
+   ========================================================== */
+
+.round-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.round-btn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.round-btn:active {
+  transform: scale(0.95);
+}
+

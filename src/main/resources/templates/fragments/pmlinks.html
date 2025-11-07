@@ -1,0 +1,37 @@
+<!-- fragments/pmlinks.html -->
+<div th:fragment="pmlinks" id="pmlinks" class="my-2">
+
+  <div class="pm-btns-inline">
+
+    <!-- Bouton : Demander assistance -->
+    <a href="https://mesdemandes.univ-antilles.fr"
+       target="_blank"
+       rel="noopener"
+       class="pm-btn-round"
+       title="Contacter le support technique">
+      <span class="mdi mdi-lifebuoy" aria-hidden="true"></span>
+      <span th:text="#{screen.help.button.support}">Demander assistance</span>
+    </a>
+
+    <!-- Bouton : Mot de passe oublié -->
+    <a href="javascript:void(0)"
+       class="pm-btn-round"
+       id="forgotPasswordLink"
+       title="Réinitialiser votre mot de passe"
+       onclick="document.getElementById('passwordManagementForm').submit();">
+      <span class="mdi mdi-lock-open" aria-hidden="true"></span>
+      <span th:text="#{screen.pm.button.resetPassword}">Mot de passe oublié</span>
+    </a>
+
+  </div>
+
+  <!-- Formulaire caché déclenché au clic -->
+  <form method="post"
+        id="passwordManagementForm"
+        style="display:none;">
+    <input type="hidden" name="execution" th:value="${flowExecutionKey}" />
+    <input type="hidden" name="_eventId" value="resetPassword" />
+  </form>
+
+</div>
+

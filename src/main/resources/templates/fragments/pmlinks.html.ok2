@@ -1,0 +1,62 @@
+<!-- fragments/pmlinks.html -->
+<div th:fragment="pmlinks" id="pmlinks" class="my-2">
+
+    <!-- Activer / Modifier son compte (bouton via event signup) -->
+    <form th:if="${accountRegistrationEnabled}" method="post" id="accountMgmtSignupForm" class="pm-item">
+        <input type="hidden" name="execution" th:value="${flowExecutionKey}" />
+        <input type="hidden" name="_eventId" value="signup" />
+        <button type="submit" id="accountSignUpLink" class="pm-link pm-btn">
+          <span class="mdi mdi-account-group" aria-hidden="true"></span>
+          <span th:text="#{screen.acct.button.signUp}">Activer/Modifier son compte UA</span>
+        </button>
+    </form>
+
+    <!-- Demander assistance (bouton, aligné à droite) -->
+    <div class="pm-item align-end">
+        <a id="supportLink"
+           class="pm-link pm-btn"
+           th:href="@{https://mesdemandes.univ-antilles.fr}"
+           target="_blank" rel="noopener">
+            <span class="mdi mdi-lifebuoy" aria-hidden="true"></span>
+            <span th:text="#{screen.help.button.support}">Demander assistance</span>
+        </a>
+    </div>
+
+    <!-- Mot de passe oublié (bouton) -->
+    <form th:if="${passwordManagementEnabled}" method="post" id="passwordManagementForm" class="pm-item">
+        <input type="hidden" name="execution" th:value="${flowExecutionKey}" />
+        <input type="hidden" name="_eventId" value="resetPassword" />
+        <a id="forgotPasswordLink"
+           class="pm-link pm-btn"
+           href="javascript:void(0)"
+           onclick="document.getElementById('passwordManagementForm').submit();">
+            <span class="mdi mdi-lock-open" aria-hidden="true"></span>
+            <span th:text="#{screen.pm.button.resetPassword}">Mot de passe oublié</span>
+        </a>
+    </form>
+
+    <!-- Nom d’utilisateur oublié (optionnel, s’affiche si activé) -->
+    <form th:if="${#bools.isTrue(passwordManagementEnabled) && #bools.isTrue(forgotUsernameEnabled)}"
+          method="post" id="forgotUsernameForm" class="pm-item">
+        <input type="hidden" name="execution" th:value="${flowExecutionKey}" />
+        <input type="hidden" name="_eventId" value="forgotUsername" />
+        <a id="forgotUsernameLink"
+           class="pm-link pm-btn"
+           href="javascript:void(0)"
+           onclick="document.getElementById('forgotUsernameForm').submit();">
+            <span class="mdi mdi-account-question" aria-hidden="true"></span>
+            <span th:text="#{screen.pm.button.forgotUsername}">Identifiant oublié</span>
+        </a>
+    </form>
+
+    <!-- Fallback si passwordManagementEnabled = false -->
+    <div th:unless="${passwordManagementEnabled}" class="pm-item">
+        <a class="pm-link pm-btn"
+           th:href="@{https://sesame.univ-antilles.fr/fusiondirectory/recovery.php?contrat=accepte}">
+            <span class="mdi mdi-lock-open" aria-hidden="true"></span>
+            <span th:text="#{screen.pm.button.forgotpwd.label}">Mot de passe oublié</span>
+        </a>
+    </div>
+
+</div>
+

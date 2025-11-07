@@ -28,6 +28,12 @@ buildscript {
             url = "https://repo.spring.io/milestone"
             mavenContent { releasesOnly() }
         }
+	maven {
+	    url = "https://jitpack.io"
+	     }
+        maven { 
+            url = "https://oss.sonatype.org/content/repositories/snapshots" 
+             }
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${project.springBootVersion}"
@@ -43,36 +49,39 @@ buildscript {
 
 repositories {
     if (project.privateRepoUrl) {
-      maven {
-        url project.privateRepoUrl
+        maven {
+            url project.privateRepoUrl
         credentials {
           username = project.privateRepoUsername
           password = System.env.PRIVATE_REPO_TOKEN
         }
       }
     }
-    mavenLocal()
-    mavenCentral()
-    maven { url = 'https://oss.sonatype.org/content/repositories/releases' }
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots'
-        mavenContent { snapshotsOnly() }
+        mavenLocal()
+        mavenCentral()
+        maven { url = 'https://oss.sonatype.org/content/repositories/releases' }
+        maven {
+            url = 'https://oss.sonatype.org/content/repositories/snapshots'
+            mavenContent { snapshotsOnly() }
     }
-    maven {
-        url = "https://repository.apache.org/content/repositories/snapshots"
-        mavenContent { snapshotsOnly() }
+        maven {
+            url = "https://repository.apache.org/content/repositories/snapshots"
+            mavenContent { snapshotsOnly() }
     }
-    maven {
-        url = 'https://build.shibboleth.net/nexus/content/repositories/releases/'
-        mavenContent { releasesOnly() }
+        maven {
+            url = 'https://build.shibboleth.net/nexus/content/repositories/releases/'
+            mavenContent { releasesOnly() }
     }
-    maven {
-        url = "https://build.shibboleth.net/nexus/content/repositories/snapshots"
-        mavenContent { snapshotsOnly() }
+        maven {
+            url = "https://build.shibboleth.net/nexus/content/repositories/snapshots"
+            mavenContent { snapshotsOnly() }
     }
-    maven {
-        url = "https://repo.spring.io/milestone"
-        mavenContent { releasesOnly() }
+        maven {
+            url = "https://repo.spring.io/milestone"
+            mavenContent { releasesOnly() }
+    }
+        maven { 
+            url = "https://jitpack.io" 
     }
 }
 
@@ -275,21 +284,15 @@ dependencies {
     /**
     * Do NOT modify the lines below or else you will risk breaking dependency management.
     **/
+
     implementation enforcedPlatform("org.apereo.cas:cas-server-support-bom:${project.'cas.version'}")
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
 
     /**
      * Do NOT modify the lines below or else you will risk breaking the build.
      **/
-    implementation "org.apereo.cas:cas-server-core-api-configuration-model"
-    implementation "org.apereo.cas:cas-server-webapp-init"
-
-    if (appServer == '-tomcat') {
-        implementation "org.apereo.cas:cas-server-webapp-init-tomcat"
-    }
     
-    developmentOnly "org.springframework.boot:spring-boot-devtools:${project.springBootVersion}"
-    // developmentOnly "org.springframework.boot:spring-boot-docker-compose:${project.springBootVersion}"
         
     /**
      * CAS dependencies and modules may be listed here.
@@ -298,10 +301,82 @@ dependencies {
      * since versions are all resolved and controlled by the dependency management
      * plugin via the CAS bom.
      **/
+
+    // --- CAS Server (Tomcat WAR) ---
+    implementation "org.apereo.cas:cas-server-webapp-tomcat:${version}@war"
+
+    // --- Authentification LDAP ---
+    implementation "org.apereo.cas:cas-server-support-ldap"
+
+    // --- Ticket Registry/Mfa MongoDB ---
+    implementation "org.apereo.cas:cas-server-support-mongo-ticket-registry"
+    implementation "org.apereo.cas:cas-server-support-trusted-mfa-mongo"
+
+    // --- CAS REST API ---
     implementation "org.apereo.cas:cas-server-support-rest"
 
+    // --- MFA (esup-otp-cas) ---
+    //implementation "org.esup-portail:esup-otp-cas:v1.2.5-cas_v7.2.x"
+    //implementation "org.esup-portail:esup-otp-cas:v1.2.7-cas_v7.2.x"
+    //implementation "org.esup-portail:esup-otp-cas:v2.1.0-cas_v7.3.x"
+    implementation "com.github.EsupPortail:esup-otp-cas:v1.2.7-cas_v7.2.x"
 
-    
+
+    // --- Patch remember-me (overlay) ---
+    implementation "org.apereo.cas:cas-server-core-cookie-api"
+    implementation "org.apereo.cas:cas-server-core-authentication-api"
+    implementation "org.apereo.cas:cas-server-core-util-api"
+    implementation "org.apereo.cas:cas-server-core-web-api"
+
+    // --- SAML2 Identity Provider ---
+    implementation "org.apereo.cas:cas-server-support-saml-idp"
+    implementation "org.apereo.cas:cas-server-support-saml"
+    implementation "org.apereo.cas:cas-server-support-saml-idp-metadata"
+
+
+    // --- Grouper integration (Internet2) ---
+    implementation "org.apereo.cas:cas-server-support-grouper"
+
+    // --- Core Services API (RegexRegisteredService, etc.) ---
+    implementation "org.apereo.cas:cas-server-core-services"
+
+    // --- Service Registry JSON ---
+    implementation "org.apereo.cas:cas-server-support-json-service-registry"
+
+    // --- Core API ---
+    implementation "org.apereo.cas:cas-server-core-api-configuration-model"
+    implementation "org.apereo.cas:cas-server-webapp-init"
+    if (appServer == '-tomcat') {
+        implementation "org.apereo.cas:cas-server-webapp-init-tomcat"
+    }
+
+    // Modules tiers existants - statistics a la ESUP
+    //implementation "com.github.vbonamy:cas-server-support-agimus-cookie:cas-6.4.x-SNAPSHOT"
+    //implementation "com.github.vbonamy:cas-server-support-agimus-logs:cas-6.6.x-SNAPSHOT"
+    implementation "org.apereo.cas:cas-server-support-metrics:${project.'cas.version'}"
+
+
+    // Autres
+    // implementation "org.apereo.cas:cas-server-support-spnego-webflow"
+    implementation "org.apereo.cas:cas-server-support-throttle"
+    // implementation "org.apereo.cas:cas-server-support-reports"
+    //implementation "org.apereo.cas:cas-server-support-oidc"
+
+    // --- Devtools ---
+    developmentOnly "org.springframework.boot:spring-boot-devtools:${project.springBootVersion}"
+
+    // --- Hazelcas ---
+    implementation "org.apereo.cas:cas-server-support-hazelcast:${project.'cas.version'}"
+
+    // --- Tests ---
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-}
 
+
+    // corriger erreur sur persistence. jpa
+    implementation "org.hibernate.orm:hibernate-core:6.5.2.Final" // ex. cohérent avec Boot 3.4.x
+    // + driver JDBC, datasource, etc.
+    if (project.hasProperty("casModules")) {
+        implementation project.casModules.split(",").collect { "org.apereo.cas:cas-server-$it" }
+    }
+
+}
