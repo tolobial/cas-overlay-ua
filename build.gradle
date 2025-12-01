@@ -373,7 +373,7 @@ dependencies {
 
 
     // corriger erreur sur persistence. jpa
-    implementation "org.hibernate.orm:hibernate-core:6.5.2.Final" // ex. cohérent avec Boot 3.4.x
+    implementation "org.hibernate.orm:hibernate-core:7.1.11.Final" // ex. cohérent avec Boot 3.4.x
     // + driver JDBC, datasource, etc.
     if (project.hasProperty("casModules")) {
         implementation project.casModules.split(",").collect { "org.apereo.cas:cas-server-$it" }
