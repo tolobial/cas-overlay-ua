@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!--
+  Layout principal du thème UA.
+  Toutes les vues (login, logout, erreurs, MFA...) héritent de ce squelette
+  via l'attribut layout:decorate="~{ua/layout}".
+
+  Le contenu spécifique à chaque vue est inséré là où se trouve
+  l'attribut layout:fragment="content" ci-dessous.
+-->
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head th:replace="~{ua/fragments/head :: head}"></head>
+
+<body>
+  <main class="cas-page">
+
+    <!-- Zone principale : remplacée par le contenu de chaque vue -->
+    <div class="cas-content" layout:fragment="content">
+      <!-- Le contenu de la vue est inséré ici par Thymeleaf -->
+    </div>
+
+    <!-- Pied de page institutionnel UA -->
+    <footer th:replace="~{ua/fragments/footer :: footer}"></footer>
+
+  </main>
+
+  <!-- JavaScript du thème (rotation des photos, toggle œil) -->
+  <script th:src="@{/themes/ua/js/ua.js}"></script>
+
+</body>
+</html>

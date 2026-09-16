@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+  Vue principale de connexion CAS — thème UA.
+  Variante visuelle : V5a "Plein écran, formulaire centré (spacieux)".
+
+  Cette vue hérite du layout commun (ua/layout.html) et assemble les fragments :
+   1. rotator      → arrière-plan photographique cyclique
+   2. topbar       → barre supérieure avec badges Guadeloupe + Martinique
+   3. login-card   → carte centrée avec logo, titre et formulaire
+-->
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{ua/layout}">
+
+<body>
+
+<!-- Tout le contenu remplace la zone layout:fragment="content" du layout -->
+<div layout:fragment="content">
+
+  <!-- 1. Rotateur de photos (arrière-plan plein écran) -->
+  <div th:replace="~{ua/fragments/rotator :: rotator}"></div>
+
+  <!-- 2. Barre supérieure : badges des deux pôles UA -->
+  <div th:replace="~{ua/fragments/topbar :: topbar}"></div>
+
+  <!-- 3. Carte de connexion centrée -->
+  <div class="form-wrap">
+    <div class="login-card login-card-on-photo is-spacious">
+
+      <!-- Logo UA -->
+      <div class="login-logo">
+        <img th:src="@{/themes/ua/images/logo-ua.png}"
+             alt="Logo Université des Antilles">
+      </div>
+
+      <!-- Titre et sous-titre -->
+      <h1 class="login-title" th:text="#{screen.welcome.welcome}">Bienvenue</h1>
+      <p class="login-subtitle" th:text="#{screen.welcome.instructions}">
+        Connectez-vous à vos services UA
+      </p>
+
+      <!-- Formulaire (fragment réutilisable, factorisable avec d'autres vues) -->
+      <div th:replace="~{ua/fragments/loginform :: loginform}"></div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

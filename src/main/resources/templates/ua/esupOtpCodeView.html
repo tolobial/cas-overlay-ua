@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!--
+  Vue MFA esup-otp — Thème UA.
+  Le formulaire OTP est construit dynamiquement par login.js (API esup-otp).
+  On ne touche pas à ce JS : on l'habille et on remplace le champ #token par
+  des cases (bloc "Masque OTP" en bas).
+-->
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{ua/layout}">
+
+<body>
+
+<div layout:fragment="content">
+
+  <!-- Rotator photos + topbar -->
+  <div th:replace="~{ua/fragments/rotator :: rotator}"></div>
+  <div th:replace="~{ua/fragments/topbar :: topbar}"></div>
+
+  <!-- CSS de l'API esup-otp (style les contrôles injectés) -->
+  <link th:href="${apiUrl} + '/public/login.css'" rel="stylesheet" />
+
+  <!-- Carte centrée -->
+  <div class="form-wrap">
+
+    <div id="data" class="login-card login-card-on-photo is-spacious mfa-card">
+
+      <!-- Logo UA -->
+      <div class="login-logo">
+        <img th:src="@{/themes/ua/images/logo-ua.png}"
+             alt="Logo Université des Antilles">
+      </div>
+
+      <!-- Pictogramme sécurité (cadenas) -->
+      <div class="ua-mfa-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h1 class="login-title">
+        <span th:utext="#{cas.mfa.esupotp.pagetitle}">Vérification en deux étapes</span>
+      </h1>
+
+      <!-- Erreurs -->
+      <div id="errors"
+           th:if="${#fields.hasErrors('${credential.*}')}"
+           class="login-error" role="alert">
+        <strong th:utext="#{cas.mfa.esupotp.failed}">Échec d'authentification</strong>
+        <br>
+        <span th:utext="#{cas.mfa.esupotp.retry}">Veuillez réessayer.</span>
+      </div>
+
+      <!-- Section principale : login.js injecte ses contrôles ici -->
+      <section id="content" class="mfa-section">
+        <div id="loginForm" class="mfa-form-wrapper">
+
+          <form method="post" id="fm1" th:object="${credential}" class="mfa-form">
+            <!-- Champs cachés requis par le webflow CAS — NE PAS RETIRER -->
+            <input type="hidden" name="_eventId_submit" value="Login" />
+            <input type="hidden" name="execution" th:value="${flowExecutionKey}" />
+          </form>
+
+        </div>
+      </section>
+
+      <!-- jQuery requis par login.js -->
+      <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+      <!-- Chargement + appel de login.js (Thymeleaf inline JS : ne pas modifier /*[[...]]*/) -->
+      <script type="module" th:inline="javascript">
+        const apiUrl = /*[[${apiUrl}]]*/ "";
+        const uid = /*[[${uid}]]*/ "";
+        const userHash = /*[[${userHash}]]*/ "";
+        const otpManagerUrl = /*[[${otpManagerUrl}]]*/ "";
+
+        import * as login_js from /*[[${apiUrl + "/public/login.js?v=1"}]]*/ "";
+
+        if (!login_js.getUserOtpMethods_and_displayChoices) {
+          alert('FATAL ERROR: vous devez mettre à jour esup-otp-api ≥ 2.2.0 ' +
+                '(ou rétrograder esup-otp-cas).');
+        }
+        login_js.getUserOtpMethods_and_displayChoices({
+          apiUrl, uid, userHash, otpManagerUrl
+        });
+      </script>
+
+      <!-- ========== Masque OTP (customisation UA) ========== -->
+      <!-- Non-invasif : ne modifie PAS login.js. Pilote le champ #token injecté. -->
+      <style>
+        .ua-otp-boxes { display:flex; gap:10px; justify-content:center; margin:10px 0 4px; }
+        .ua-otp-box {
+          width:48px; height:56px; text-align:center;
+          font-size:24px; font-weight:600;
+          border:2px solid var(--ua-bleu-outremer, #202E56);
+          border-radius:2px;
+          background:#fff; color:var(--ua-bleu-outremer, #202E56);
+          caret-color:var(--ua-bleu-lagon, #00A0DC); outline:none;
+          -webkit-text-security:disc;
+          transition:border-color .12s ease, box-shadow .12s ease;
+        }
+        .ua-otp-wrap.is-revealed .ua-otp-box { -webkit-text-security:none; }
+        .ua-otp-box:focus {
+          border-color:var(--ua-bleu-lagon, #00A0DC);
+          box-shadow:0 0 0 3px rgba(0,160,220,.25);
+        }
+        .ua-otp-box.filled { border-color:var(--ua-bleu-lagon, #00A0DC); }
+        .ua-otp-show {
+          display:flex; align-items:center; justify-content:center; gap:.5rem;
+          margin:.6rem 0 0; font-size:.9rem; color:var(--ua-bleu-outremer, #202E56);
+          cursor:pointer; user-select:none;
+        }
+        .ua-otp-show-cb {
+          width:18px; height:18px; accent-color:var(--ua-bleu-lagon, #00A0DC); cursor:pointer;
+        }
+        #token.ua-otp-hidden {
+          position:absolute !important; width:1px; height:1px;
+          padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0);
+          white-space:nowrap; border:0;
+        }
+        .login-card #fm1 #toggle_code_visibility-LABEL { display:none !important; }
+      </style>
+
+      <script>
+      (function () {
+        'use strict';
+
+        function enhance(token) {
+          if (token.dataset.uaEnhanced === '1') return;   // idempotent
+          token.dataset.uaEnhanced = '1';
+
+          var LENGTH = parseInt(token.getAttribute('maxlength'), 10) || 6;
+          token.classList.add('ua-otp-hidden');
+
+          var wrap = document.createElement('div');
+          wrap.className = 'ua-otp-wrap';
+
+          var boxesEl = document.createElement('div');
+          boxesEl.className = 'ua-otp-boxes';
+          boxesEl.setAttribute('role', 'group');
+          boxesEl.setAttribute('aria-label', 'Code à ' + LENGTH + ' chiffres');
+
+          var inputs = [];
+          for (var i = 0; i < LENGTH; i++) {
+            var b = document.createElement('input');
+            b.className = 'ua-otp-box';
+            b.type = 'text'; b.inputMode = 'numeric'; b.maxLength = 1;
+            b.autocomplete = (i === 0) ? 'one-time-code' : 'off';
+            b.setAttribute('aria-label', 'Chiffre ' + (i + 1));
+            boxesEl.appendChild(b);
+            inputs.push(b);
+          }
+
+          var showLabel = document.createElement('label');
+          showLabel.className = 'ua-otp-show';
+          var showCb = document.createElement('input');
+          showCb.type = 'checkbox'; showCb.className = 'ua-otp-show-cb';
+          showLabel.appendChild(showCb);
+          showLabel.appendChild(document.createTextNode(' Afficher le code'));
+
+          wrap.appendChild(boxesEl);
+          wrap.appendChild(showLabel);
+          token.parentNode.insertBefore(wrap, token.nextSibling);
+
+          showCb.addEventListener('change', function () {
+            wrap.classList.toggle('is-revealed', showCb.checked);
+          });
+
+          function syncVisibility() {
+            wrap.style.display = token.classList.contains('d-none') ? 'none' : '';
+          }
+          new MutationObserver(syncVisibility)
+            .observe(token, { attributes: true, attributeFilter: ['class'] });
+          syncVisibility();
+
+          function syncToToken() {
+            token.value = inputs.map(function (x) { return x.value; }).join('');
+            token.dispatchEvent(new Event('input', { bubbles: true }));
+            token.dispatchEvent(new Event('keyup', { bubbles: true }));
+          }
+          function focusBox(i) {
+            if (i >= 0 && i < LENGTH) inputs[i].focus({ preventScroll: true });
+          }
+          function keepTopVisible() {
+            var card = token.closest('.login-card');
+            if (card) card.scrollTop = 0;
+          }
+
+          inputs.forEach(function (box, i) {
+            box.addEventListener('input', function () {
+              box.value = box.value.replace(/\D/g, '').slice(-1);
+              box.classList.toggle('filled', box.value !== '');
+              if (box.value && i < LENGTH - 1) focusBox(i + 1);
+              syncToToken();
+            });
+            box.addEventListener('keydown', function (e) {
+              if (e.key === 'Backspace' && box.value === '' && i > 0) focusBox(i - 1);
+              else if (e.key === 'ArrowLeft' && i > 0) { e.preventDefault(); focusBox(i - 1); }
+              else if (e.key === 'ArrowRight' && i < LENGTH - 1) { e.preventDefault(); focusBox(i + 1); }
+            });
+            box.addEventListener('paste', function (e) {
+              e.preventDefault();
+              var data = (e.clipboardData || window.clipboardData).getData('text');
+              var digits = data.replace(/\D/g, '').slice(0, LENGTH).split('');
+              digits.forEach(function (d, k) {
+                if (inputs[k]) { inputs[k].value = d; inputs[k].classList.add('filled'); }
+              });
+              focusBox(Math.min(digits.length, LENGTH - 1));
+              syncToToken();
+            });
+          });
+
+          token.addEventListener('focus', function () { focusBox(0); keepTopVisible(); });
+          focusBox(0);
+          keepTopVisible();
+        }   /* <-- fermeture de enhance() : c'est ELLE qui manquait */
+
+        function tryEnhance() {
+          var t = document.getElementById('token');
+          if (t) enhance(t);
+        }
+        tryEnhance();
+
+        var root = document.getElementById('content') || document.body;
+        new MutationObserver(tryEnhance).observe(root, { childList: true, subtree: true });
+      })();
+      </script>
+      <!-- ========== fin masque OTP UA ========== -->
+
+      <!-- Lien retour login -->
+      <div class="login-links mfa-back">
+        <a th:href="@{/logout}">Annuler et revenir à la connexion</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!--
+  Fragment rotator : arrière-plan photographique cyclique.
+
+  Les slides sont générées dynamiquement par Thymeleaf à partir de la
+  liste retournée par le bean Spring @uaPhotos. Cette liste contient
+  10 photos (5 du dossier Guadeloupe/ + 5 du dossier Martinique/) tirées
+  aléatoirement à CHAQUE login et mélangées.
+
+  Mécanique : ${@uaPhotos.list()} appelle la méthode list() du bean Spring
+  nommé "uaPhotos" (déclaré dans UaThemeConfiguration). On stocke le
+  résultat dans une variable locale "photos" via th:with pour éviter
+  d'appeler la méthode deux fois (une fois pour les slides, une fois
+  pour les points indicateurs).
+
+  Si la liste est vide (dossier /etc/cas/themes/ua/photos absent ou vide),
+  aucun fond photographique ne s'affiche — la page reste fonctionnelle.
+
+  La logique de bascule entre les slides est dans /themes/ua/js/ua.js
+  (intervalle 10 s, fondu 1,5 s — paramétrables dans ua.css).
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="rotator"
+     class="rotator"
+     th:with="photos=${@uaPhotos.list()}">
+
+  <!-- Une div .slide par photo, dans l'ordre mélangé fourni par le bean -->
+  <div th:each="photo : ${photos}"
+       class="slide"
+       th:style="'background-image:url(' + ${photo.url} + ')'"
+       th:attr="data-pole=${photo.pole}"></div>
+
+  <!-- Voile sombre sur la photo pour la lisibilité du formulaire -->
+  <div class="rotator-overlay"></div>
+
+  <!-- Points indicateurs : un par photo -->
+  <div class="rotation-dots">
+    <span th:each="photo : ${photos}" class="dot"></span>
+  </div>
+
+</div>
+
+</body>
+</html>

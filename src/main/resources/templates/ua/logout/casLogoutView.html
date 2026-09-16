@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!--
+  casLogoutView — Thème UA.
+
+  Page de confirmation finale après déconnexion réussie.
+  S'affiche après le POST de casConfirmLogoutView.
+
+  Variables Thymeleaf préservées :
+    ${loginUrl}         : URL de re-connexion (calculée via @{/login})
+    ${enableProceed}    : booléen, true si propagation logout en cours
+    ${flowExecutionKey} : token webflow (si enableProceed)
+
+  Clés i18n d'origine respectées :
+    screen.logout.header   : titre
+    screen.logout.success  : message paramétré avec loginUrl
+    screen.logout.security : mention sécurité
+
+  Note : on a remplacé jQuery par vanilla JS pour éviter une dépendance
+  supplémentaire (clearLocalStorage / clearSessionStorage / submit).
+-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{ua/layout}">
+
+<body>
+
+<div layout:fragment="content">
+
+  <div th:replace="~{ua/fragments/rotator :: rotator}"></div>
+  <div th:replace="~{ua/fragments/topbar :: topbar}"></div>
+
+  <style>
+    /* ============================================================
+       casLogoutView — styles dédiés (responsive)
+       Hérite du glassmorphism de .login-card via ua.css.
+       ============================================================ */
+    .login-card.logout-success-card {
+      max-width: 560px;
+      width: calc(100% - 2rem);
+      padding: 0;
+      overflow: hidden;
+      animation: ua-fade-in 0.4s ease-out;
+      text-align: center;
+    }
+    @keyframes ua-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logout-success-icon {
+      width: 72px;
+      height: 72px;
+      margin: 2rem auto 1rem;
+      border-radius: 50%;
+      background: rgba(0, 160, 220, 0.12);
+      color: var(--ua-bleu-lagon, #00A0DC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logout-success-icon svg { width: 38px; height: 38px; }
+
+    .logout-success-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ua-bleu-outremer, #202E56);
+      margin: 0 1.5rem 0.75rem;
+      line-height: 1.3;
+    }
+
+    .logout-success-message {
+      color: var(--ua-texte, #1A2540);
+      line-height: 1.6;
+      font-size: 0.95rem;
+      margin: 0 1.5rem 1rem;
+    }
+    .logout-success-message a {
+      color: var(--ua-bleu-outremer, #202E56);
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: var(--ua-bleu-lagon, #00A0DC);
+      text-underline-offset: 2px;
+    }
+
+    .logout-security {
+      background: rgba(245, 247, 250, 0.85);
+      border-left: 3px solid var(--ua-bleu-lagon, #00A0DC);
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.9rem;
+      color: var(--ua-texte, #1A2540);
+      line-height: 1.5;
+      margin: 0 1.5rem 1.5rem;
+      text-align: left;
+    }
+
+    /* Spinner de propagation logout */
+    .logout-proceed {
+      margin: 0 1.5rem 1.5rem;
+      padding: 1rem;
+      background: rgba(245, 247, 250, 0.6);
+      border-radius: 6px;
+      color: var(--ua-texte-faible, #5B6478);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(0, 160, 220, 0.25);
+      border-top-color: var(--ua-bleu-lagon, #00A0DC);
+      border-radius: 50%;
+      animation: ua-spin 0.8s linear infinite;
+    }
+    @keyframes ua-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .logout-back-link {
+      display: inline-block;
+      margin: 0 0 2rem;
+      color: var(--ua-bleu-outremer, #202E56);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--ua-bleu-outremer, #202E56);
+      border-radius: 5px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .logout-back-link:hover {
+      background: var(--ua-bleu-outremer, #202E56);
+      color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .login-card.logout-success-card { width: calc(100% - 1rem); }
+      .logout-success-icon { width: 60px; height: 60px; margin-top: 1.5rem; }
+      .logout-success-icon svg { width: 32px; height: 32px; }
+      .logout-success-title { font-size: 1.2rem; }
+      .logout-back-link { width: calc(100% - 3rem); margin: 0 1.5rem 1.5rem; text-align: center; }
+    }
+  </style>
+
+  <div class="form-wrap">
+    <div class="login-card login-card-on-photo logout-success-card">
+
+      <!-- Icône de validation -->
+      <div class="logout-success-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+
+      <!-- Titre i18n -->
+      <h1 class="logout-success-title" th:utext="#{screen.logout.header}">
+        Vous êtes déconnecté
+      </h1>
+
+      <!--
+        Message paramétré : la clé screen.logout.success contient un {0}
+        qui sera substitué par l'URL de login. Si l'utilisateur clique sur
+        le lien dans le message, il revient sur /cas/login.
+      -->
+      <p id="logoutMessage" class="logout-success-message"
+         th:with="loginUrl=@{/login}"
+         th:utext="#{screen.logout.success(${loginUrl})}">
+        Vous vous êtes déconnecté du Service Central d'Authentification.
+        Vous pouvez <a th:href="@{/login}">vous reconnecter</a>.
+      </p>
+
+      <!-- Mention sécurité -->
+      <div class="logout-security" th:utext="#{screen.logout.security}">
+        Pour des raisons de sécurité, fermez votre navigateur.
+      </div>
+
+      <!--
+        Propagation logout : quand CAS doit notifier d'autres apps SSO,
+        il définit enableProceed=true et fournit un flowExecutionKey.
+        On affiche un spinner et on auto-submit le form après 1 seconde.
+      -->
+      <div th:remove="tag" th:if="${enableProceed}">
+        <div class="logout-proceed">
+          <div class="spinner" aria-hidden="true"></div>
+          <span>Propagation de la déconnexion en cours…</span>
+        </div>
+        <form method="post" id="logoutform" th:action="@{/logout}" style="display:none;">
+          <input type="hidden" name="execution" th:value="${flowExecutionKey}"/>
+          <input type="hidden" name="_eventId" value="proceed"/>
+        </form>
+        <script th:inline="javascript">
+          /*<![CDATA[*/
+          // Auto-submit après 1s pour déclencher la propagation logout
+          // (vanilla JS, pas de dépendance jQuery)
+          setTimeout(function() {
+            var f = document.getElementById('logoutform');
+            if (f) f.submit();
+          }, 1000);
+          /*]]>*/
+        </script>
+      </div>
+
+      <!--
+        Pas de propagation : on nettoie localStorage / sessionStorage
+        pour effacer toute trace d'authentification côté navigateur.
+      -->
+      <div th:remove="tag" th:unless="${enableProceed}">
+        <a class="logout-back-link" th:href="@{/login}">Se reconnecter</a>
+        <script th:inline="javascript">
+          /*<![CDATA[*/
+          try { localStorage.clear(); } catch (e) {}
+          try { sessionStorage.clear(); } catch (e) {}
+          /*]]>*/
+        </script>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

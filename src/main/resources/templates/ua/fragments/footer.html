@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!--
+  Fragment pied de page institutionnel UA.
+  Inclus par layout.html via th:replace.
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="cas-footer">
+  <div>
+    <span class="pill" th:text="#{ua.footer.label}">UA@DSIN</span>
+    <span th:text="#{ua.footer.text}">Université des Antilles — Service d'authentification CAS</span>
+  </div>
+  <div class="cas-footer-right">
+    <span th:text="#{ua.footer.poweredby}">Propulsé par Apereo CAS</span>
+  </div>
+</footer>
+
+</body>
+</html>

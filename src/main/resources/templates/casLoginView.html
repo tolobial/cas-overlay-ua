@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Connexion - Université des Antilles</title>
+    
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"/>
+    
+    <!-- Glassmorphism CSS -->
+    <link rel="stylesheet" th:href="@{/css/glassmorphism.css}"/>
+</head>
+<body>
+    <div class="container">
+        <div class="glass-card">
+            <!-- Header -->
+            <div class="glass-header">
+                <div class="glass-logo">
+                    <img th:src="@{/images/logo-ua.png}" alt="UA"/>
+                </div>
+                <h1 class="glass-title">Portail d'authentification</h1>
+                <p class="glass-subtitle">Université des Antilles</p>
+            </div>
+
+            <!-- Messages d'erreur -->
+            <div th:if="${#fields.hasErrors('*')}" class="glass-alert">
+                <strong><i class="mdi mdi-alert-circle"></i> Échec de l'authentification</strong>
+                <span th:text="#{screen.welcome.label.failed}">Identifiants incorrects</span>
+            </div>
+
+            <!-- Formulaire -->
+            <form method="post" id="fm1" th:object="${credential}" class="glass-form">
+                <!-- Identifiant -->
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="mdi mdi-account"></i>
+                        Identifiant
+                    </label>
+                    <input type="text" 
+                           id="username" 
+                           name="username"
+                           th:field="*{username}"
+                           class="glass-input"
+                           placeholder="Entrez votre identifiant"
+                           autocomplete="username"
+                           autocapitalize="off"
+                           spellcheck="false"
+                           required
+                           autofocus/>
+                </div>
+
+                <!-- Mot de passe -->
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="mdi mdi-lock"></i>
+                        Mot de passe
+                    </label>
+                    <input type="password" 
+                           id="password" 
+                           name="password"
+                           th:field="*{password}"
+                           class="glass-input"
+                           placeholder="Entrez votre mot de passe"
+                           autocomplete="current-password"
+                           required/>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="form-check">
+                    <input type="checkbox" 
+                           id="rememberMe" 
+                           name="rememberMe"
+                           class="glass-checkbox"/>
+                    <label for="rememberMe" class="form-check-label">
+                        Se souvenir de moi
+                    </label>
+                </div>
+
+                <!-- Champs cachés -->
+                <input type="hidden" name="execution" th:value="${flowExecutionKey}"/>
+                <input type="hidden" name="_eventId" value="submit"/>
+                <input type="hidden" name="geolocation"/>
+
+                <!-- Bouton de connexion -->
+                <button type="submit" class="glass-button">
+                    <i class="mdi mdi-login"></i>
+                    Se connecter
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="glass-footer">
+                <div class="glass-footer-links">
+                    <a href="https://www.univ-antilles.fr" class="glass-footer-link" target="_blank">
+                        <i class="mdi mdi-web"></i> Site web
+                    </a>
+                    <a href="#" class="glass-footer-link">
+                        <i class="mdi mdi-help-circle"></i> Aide
+                    </a>
+                    <a href="#" class="glass-footer-link">
+                        <i class="mdi mdi-email"></i> Contact
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay de chargement -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // Afficher le loader pendant la soumission
+        document.getElementById('fm1').addEventListener('submit', function() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        });
+    </script>
+</body>
+</html>

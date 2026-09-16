@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+  Vue "Trusted Device Registration" — Thème UA.
+  
+  Affichée APRÈS validation OTP réussie si :
+    - cas.authn.mfa.trusted.core.device-registration-enabled=true
+    - L'appareil n'est pas déjà reconnu comme "trusted" dans MongoDB
+  
+  Permet à l'user de nommer son appareil et choisir la durée pendant laquelle
+  il sera reconnu (évite de redemander l'OTP à chaque connexion sur ce
+  navigateur/cet appareil pendant la durée choisie).
+-->
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{ua/layout}">
+
+<body>
+
+<div layout:fragment="content">
+
+  <!-- Rotator photos + topbar : repris du layout login -->
+  <div th:replace="~{ua/fragments/rotator :: rotator}"></div>
+  <div th:replace="~{ua/fragments/topbar :: topbar}"></div>
+
+  <div class="form-wrap">
+    <div id="login" class="login-card login-card-on-photo is-spacious">
+
+      <!-- Logo UA -->
+      <div class="login-logo">
+        <img th:src="@{/themes/ua/images/logo-ua.png}"
+             alt="Logo Université des Antilles">
+      </div>
+
+      <!-- Titre et intro -->
+      <h1 class="login-title" th:text="#{cas.mfa.registerdevice.label.title}">
+        Reconnaître cet appareil
+      </h1>
+      <p class="login-subtitle" th:text="#{cas.mfa.registerdevice.label.intro}">
+        Nommez l'appareil que vous utilisez actuellement.
+      </p>
+
+      <!-- Formulaire d'enregistrement -->
+      <form method="post"
+            id="registerform"
+            th:object="${mfaTrustRecord}"
+            th:action="@{/login}"
+            class="login-form">
+
+        <!-- Nom de l'appareil -->
+        <div class="login-field">
+          <label for="deviceName" th:text="#{cas.mfa.registerdevice.label.name}">
+            Nom de l'appareil
+          </label>
+          <input type="text"
+                 id="deviceName"
+                 name="deviceName"
+                 th:field="*{deviceName}"
+                 placeholder="Mon ordinateur"
+                 autocomplete="off"
+                 required>
+        </div>
+
+        <!-- Question durée -->
+        <p class="mfa-duration-label" th:text="#{cas.mfa.registerdevice.label.duration}">
+          Combien de temps voulez-vous mémoriser cet appareil ?
+        </p>
+
+        <!-- Sélecteur de durée (nombre + unité) -->
+        <div class="mfa-duration-fields">
+
+          <div id="expirationField" class="login-field" style="display:none">
+            <label for="expiration" th:text="#{cas.mfa.registerdevice.label.expiration}">
+              Durée
+            </label>
+            <input type="number"
+                   id="expiration"
+                   name="expiration"
+                   th:field="*{expiration}"
+                   min="1"
+                   autocomplete="off">
+          </div>
+
+          <div class="login-field">
+            <label for="timeUnit">Unité</label>
+            <select name="timeUnit"
+                    id="timeUnit"
+                    th:field="*{timeUnit}"
+                    onchange="document.getElementById('expirationField').style.display = (this.value!=='FOREVER') ? 'block' : 'none'">
+              <option value="SECONDS" th:text="#{screen.consent.options.timeunit.seconds}">Secondes</option>
+              <option value="MINUTES" th:text="#{screen.consent.options.timeunit.minutes}">Minutes</option>
+              <option value="HOURS"   th:text="#{screen.consent.options.timeunit.hours}">Heures</option>
+              <option value="DAYS"    th:text="#{screen.consent.options.timeunit.days}">Jours</option>
+              <option value="WEEKS"   th:text="#{screen.consent.options.timeunit.weeks}">Semaines</option>
+              <option value="MONTHS"  th:text="#{screen.consent.options.timeunit.months}">Mois</option>
+              <option value="YEARS"   th:text="#{screen.consent.options.timeunit.years}">Années</option>
+              <option value="FOREVER" th:text="#{cas.mfa.registerdevice.options.timeunit.forever}">Toujours</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Boutons : chaque bouton porte son propre _eventId via name+value -->
+        <div class="mfa-buttons">
+          <button type="submit"
+                  name="_eventId"
+                  value="submit"
+                  class="login-button"
+                  accesskey="s">
+            <span th:text="#{cas.mfa.registerdevice.button.register}">Mémoriser</span>
+          </button>
+          <button type="submit"
+                  name="_eventId"
+                  value="skip"
+                  class="login-button login-button-secondary"
+                  formnovalidate
+                  accesskey="k">
+            <span th:text="#{cas.mfa.registerdevice.button.skip}">Passer</span>
+          </button>
+        </div>
+
+        <!-- Champs cachés webflow -->
+        <input type="hidden" name="geolocation"/>
+        <input type="hidden" name="execution" th:value="${flowExecutionKey}"/>
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

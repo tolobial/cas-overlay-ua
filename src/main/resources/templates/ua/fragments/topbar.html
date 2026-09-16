@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<!--
+  Fragment top-bar : barre supérieure avec les badges des deux pôles UA.
+  L'attribut data-pole permet à syncPoleBadge() (ua.js) d'activer
+  visuellement le badge correspondant à la photo affichée par le rotator.
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="topbar" class="top-bar">
+  <div class="poles-left">
+    <span class="pole-badge guadeloupe"
+          data-pole="guadeloupe"
+          th:text="#{ua.pole.guadeloupe}">Guadeloupe</span>
+    <span class="pole-separator" aria-hidden="true">·</span>
+    <span class="pole-badge martinique"
+          data-pole="martinique"
+          th:text="#{ua.pole.martinique}">Martinique</span>
+  </div>
+</div>
+</body>
+</html>

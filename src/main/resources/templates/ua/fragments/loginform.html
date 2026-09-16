@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--
+  Fragment loginform : formulaire de connexion CAS.
+
+  Points clés Thymeleaf :
+  - th:object="${credential}" : l'objet du modèle CAS qui porte username/password.
+  - th:field="*{username}" : génère automatiquement id, name et value, et bind
+    le champ HTML sur la propriété username de l'objet credential.
+  - Champs cachés "execution" et "_eventId" : OBLIGATOIRES pour le webflow CAS.
+    Sans eux, CAS ne sait pas dans quel état du flow il se trouve.
+  - "rememberMe" : checkbox standard de CAS. Activable côté serveur via
+    cas.ticket.tgt.remember-me.enabled=true dans cas.properties.
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<form th:fragment="loginform"
+      method="post"
+      th:object="${credential}"
+      action="login"
+      id="fm1"
+      class="login-form">
+
+  <!--
+    Affichage des erreurs du formulaire (mauvais mot de passe, compte verrouillé,
+    etc.). Thymeleaf récupère les erreurs liées à l'objet ${credential}.
+  -->
+  <div th:if="${#fields.hasErrors('${credential.*}')}"
+       class="login-error"
+       role="alert">
+    <span th:each="err : ${#fields.errors('${credential.*}')}"
+          th:utext="${err}"></span>
+  </div>
+
+  <!-- Identifiant -->
+  <div class="login-field">
+    <label for="username" th:text="#{screen.welcome.label.netid}">Identifiant</label>
+    <input type="text"
+           id="username"
+           th:field="*{username}"
+           th:placeholder="#{screen.welcome.label.netid.placeholder}"
+           autocomplete="username"
+           autocapitalize="none"
+           spellcheck="false"
+           autofocus
+           required>
+  </div>
+
+  <!-- Mot de passe + bouton œil afficher/masquer -->
+  <div class="login-field">
+    <label for="password" th:text="#{screen.welcome.label.password}">Mot de passe</label>
+    <div class="with-eye">
+      <input type="password"
+             id="password"
+             th:field="*{password}"
+             th:placeholder="#{screen.welcome.label.password.placeholder}"
+             autocomplete="current-password"
+             required>
+      <button type="button"
+              class="toggle-eye"
+              aria-label="Afficher ou masquer le mot de passe">👁</button>
+    </div>
+  </div>
+
+  <!-- Se souvenir de moi (rememberMe natif CAS, TGT longue durée) -->
+  <label class="login-remember">
+    <input type="checkbox" name="rememberMe" value="true">
+    <span th:text="#{screen.rememberme.checkbox}">Se souvenir de moi sur cet appareil</span>
+  </label>
+
+  <!--
+    Champs cachés requis par le webflow CAS.
+    - execution : identifie l'instance du webflow (généré par CAS)
+    - _eventId  : indique quelle transition déclencher (ici "submit" = valider)
+    - geolocation : optionnel, peut être renseigné par JS pour la géoloc
+  -->
+  <input type="hidden" name="execution" th:value="${flowExecutionKey}"/>
+  <input type="hidden" name="_eventId" value="submit"/>
+  <input type="hidden" name="geolocation"/>
+
+  <!-- Bouton de soumission -->
+  <button type="submit" name="submit" class="login-button">
+    <span th:text="#{screen.welcome.button.login}">Se connecter</span>
+  </button>
+
+  <!-- Lien mot de passe oublié -->
+  <div class="login-links">
+    <a href="https://sesame.univ-antilles.fr/fusiondirectory/recovery.php?contrat=accepte" th:text="#{screen.welcome.password.forgot}">Mot de passe oublié ?</a>
+  </div>
+
+  <!-- Rappel de sécurité en bas du formulaire -->
+  <p class="login-help" th:text="#{screen.welcome.security}">
+    Pour des raisons de sécurité, pensez à vous déconnecter et fermer votre
+    navigateur après usage.
+  </p>
+
+</form>
+
+</body>
+</html>

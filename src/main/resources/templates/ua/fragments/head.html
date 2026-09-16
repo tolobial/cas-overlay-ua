@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  Fragment <head> commun à toutes les vues du thème UA.
+  Inclus par layout.html via th:replace.
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="#{screen.welcome.welcome} + ' — UA'">Bienvenue — UA</title>
+
+  <!--
+    Police Open Sans auto-hébergée :
+    les @font-face sont déclarés en tête de ua.css.
+  -->
+
+  <!-- Feuille de style du thème UA -->
+  <link rel="stylesheet" th:href="@{/themes/ua/css/ua.css}">
+
+  <!--
+    NB : pas de preload de photo ici. Le bean @uaPhotos est appelé une
+    seule fois dans rotator.html, le préchargement serait pour une
+    autre photo (l'ordre est aléatoire par appel). Le navigateur lance
+    le téléchargement de la 1re slide naturellement.
+  -->
+</head>
+
+</html>

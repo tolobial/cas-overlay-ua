@@ -1,0 +1,10 @@
+backup-*/
+*.bak.*
+*.bak
+*.sav
+*.swp
+tmpdir/
+/groupe
+/build/
+.gradle/
+build.gradle.pat

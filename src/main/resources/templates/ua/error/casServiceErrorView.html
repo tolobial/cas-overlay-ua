@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<!--
+  casServiceErrorView — Thème UA.
+
+  Page d'erreur affichée quand :
+    - Un ticket est invalide ou expiré ("Le ticket X est inconnu")
+    - Une application non enregistrée tente d'utiliser CAS
+    - Toute autre RootCasException
+
+  Variables Thymeleaf préservées :
+    ${rootCauseException}        : exception ayant causé l'erreur
+    ${rootCauseException.code}   : clé i18n du message d'erreur
+
+  Clés i18n d'origine respectées :
+    screen.service.error.header   : titre (Application non autorisée…)
+    ${rootCauseException.code}    : message d'erreur paramétré (Le ticket X…)
+-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{ua/layout}">
+
+<body>
+
+<div layout:fragment="content">
+
+  <div th:replace="~{ua/fragments/rotator :: rotator}"></div>
+  <div th:replace="~{ua/fragments/topbar :: topbar}"></div>
+
+  <style>
+    /* ============================================================
+       casServiceErrorView — styles dédiés (responsive)
+       Hérite du glassmorphism de .login-card via ua.css.
+       Tonalité d'erreur via le grenat Martinique.
+       ============================================================ */
+    .login-card.error-card {
+      max-width: 620px;
+      width: calc(100% - 2rem);
+      padding: 0;
+      overflow: hidden;
+      animation: ua-fade-in 0.4s ease-out;
+      text-align: center;
+    }
+    @keyframes ua-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bandeau supérieur grenat pour signaler l'erreur */
+    .error-band {
+      background: var(--ua-grenat-martinique, #9B1E21);
+      color: #fff;
+      padding: 0.55rem 1.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .error-icon {
+      width: 72px;
+      height: 72px;
+      margin: 1.75rem auto 1rem;
+      border-radius: 50%;
+      background: rgba(155, 30, 33, 0.12);
+      color: var(--ua-grenat-martinique, #9B1E21);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .error-icon svg { width: 38px; height: 38px; }
+
+    .error-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--ua-bleu-outremer, #202E56);
+      margin: 0 1.5rem 0.75rem;
+      line-height: 1.3;
+    }
+
+    .error-message {
+      color: var(--ua-texte, #1A2540);
+      line-height: 1.6;
+      font-size: 0.95rem;
+      margin: 0 1.5rem 1.5rem;
+    }
+    .error-message code {
+      background: rgba(155, 30, 33, 0.08);
+      color: var(--ua-grenat-martinique, #9B1E21);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+      font-size: 0.88rem;
+    }
+
+    .error-help {
+      background: rgba(245, 247, 250, 0.85);
+      border-left: 3px solid var(--ua-bleu-lagon, #00A0DC);
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.88rem;
+      color: var(--ua-texte, #1A2540);
+      line-height: 1.5;
+      margin: 0 1.5rem 1.5rem;
+      text-align: left;
+    }
+    .error-help strong { color: var(--ua-bleu-outremer, #202E56); }
+
+    .error-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin: 0 1.5rem 2rem;
+      flex-wrap: wrap;
+    }
+    .btn-back-login {
+      background: var(--ua-bleu-outremer, #202E56);
+      color: #fff;
+      border: 0;
+      padding: 0.7rem 1.5rem;
+      border-radius: 5px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s ease;
+    }
+    .btn-back-login:hover { background: #16213e; }
+
+    .btn-back-history {
+      color: var(--ua-bleu-outremer, #202E56);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: 5px;
+      border: 1px solid var(--ua-bleu-outremer, #202E56);
+      transition: background .15s ease;
+    }
+    .btn-back-history:hover { background: rgba(32, 46, 86, 0.05); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .login-card.error-card { width: calc(100% - 1rem); }
+      .error-icon { width: 60px; height: 60px; margin-top: 1.25rem; }
+      .error-icon svg { width: 32px; height: 32px; }
+      .error-title { font-size: 1.15rem; }
+      .error-actions { flex-direction: column-reverse; }
+      .btn-back-login, .btn-back-history { width: 100%; text-align: center; }
+    }
+  </style>
+
+  <div class="form-wrap">
+    <div class="login-card login-card-on-photo error-card">
+
+      <!-- Bandeau d'erreur -->
+      <div class="error-band">Erreur</div>
+
+      <!-- Icône triangle d'avertissement -->
+      <div class="error-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+
+      <!-- Titre i18n -->
+      <h1 class="error-title" th:utext="#{screen.service.error.header}">
+        Application non autorisée à utiliser CAS
+      </h1>
+
+      <!--
+        Message paramétré : la clé vient de l'exception (rootCauseException.code).
+        Exemple : INVALID_TICKET → "Le ticket X est inconnu".
+        Le th:if vérifie que c'est bien une RootCasException, sinon n'affiche rien.
+      -->
+      <p class="error-message"
+         th:if="${rootCauseException instanceof T(org.apereo.cas.authentication.RootCasException)}"
+         th:utext="#{${rootCauseException.code}}">
+        Détail de l'erreur ici.
+      </p>
+
+      <!-- Aide contextuelle pour aider l'utilisateur à se sortir de l'impasse -->
+      <div class="error-help">
+        <strong>Que faire ?</strong> Cette erreur peut survenir si votre session
+        a expiré ou si l'application que vous tentez d'utiliser n'est pas enregistrée
+        auprès du service d'authentification. Essayez de vous reconnecter ou de
+        revenir à la page précédente.
+      </div>
+
+      <!-- Actions -->
+      <div class="error-actions">
+        <a class="btn-back-history" href="javascript:history.back()">Retour</a>
+        <a class="btn-back-login" th:href="@{/login}">Se reconnecter</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
