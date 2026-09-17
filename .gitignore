@@ -8,3 +8,4 @@ tmpdir/
 /build/
 .gradle/
 build.gradle.pat
+.github/workflows/build.yml
