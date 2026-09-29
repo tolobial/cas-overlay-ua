@@ -322,6 +322,12 @@ dependencies {
     implementation "org.apereo.cas:cas-server-support-mongo-ticket-registry"
     implementation "org.apereo.cas:cas-server-support-trusted-mfa-mongo"
 
+    // === Authentication Interrupt (contrôle supannMailPerso, cf. docs/interrupt-supannMailPerso.md) ===
+    // Version portée par la BOM (cas.version). core-scripting apporte le runtime Groovy,
+    // absent du war sans lui, et requis par cas.interrupt.groovy.location.
+    implementation "org.apereo.cas:cas-server-support-interrupt-webflow"
+    implementation "org.apereo.cas:cas-server-core-scripting"
+
     // === REST API Support ===
     implementation "org.apereo.cas:cas-server-support-rest"
 
